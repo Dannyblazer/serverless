@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 
@@ -26,4 +27,20 @@ func DeployFunction(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Function deployed successfully", "path": savePath})
+}
+
+func ListFunction(c *gin.Context) {
+	// Fetch all available function apps
+
+	// return list
+	fmt.Println("Function apps listed")
+	c.JSON(http.StatusOK, gin.H{"message": "Function listed successfully"})
+}
+
+func InvokeFunction(c *gin.Context) {
+	// fetch the function app by name/ID
+	// launch the function app
+	var funcPath string
+	fmt.Println(funcPath)
+
 }
