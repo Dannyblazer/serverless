@@ -5,9 +5,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"serverless/initializers"
 
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	initializers.LoadEnvVariables()
+	initializers.ConnectDB()
+}
 
 func main() {
 	// Create the main "platform" command
@@ -50,6 +56,7 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Hello People")
 			// List function Logic goes here
+			// Retrieve list from database or json file
 		},
 	}
 
