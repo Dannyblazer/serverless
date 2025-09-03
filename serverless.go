@@ -5,8 +5,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"serverless/controllers"
 	"serverless/initializers"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +18,15 @@ func init() {
 }
 
 func main() {
+	// Start API router
+	router := gin.Default()
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
+
+	// Api Routes
+	router.POST("deploy/", controllers.DeployFunction)
+	router.GET("list/", controllers.ListFunction)
+	router.POST("invoke/:id", controllers.InvokeFunction)
+
 	// Create the main "platform" command
 	var rootCmd = &cobra.Command{Use: "platform"}
 
@@ -100,4 +111,5 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	router.Run()
 }
