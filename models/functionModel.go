@@ -6,6 +6,7 @@ import (
 
 type FunctionApp struct {
 	gorm.Model
-	name string `gorm:"unique"`
-	path string
+	Name string `gorm:"unique"`
+	Path string
+	Size int64
 }
