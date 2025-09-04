@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"serverless/controllers"
 	"serverless/initializers"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -80,7 +82,11 @@ func main() {
 				fmt.Printf("Error: File %s does not exist\n", funcPath)
 				return
 			}
-			command := exec.Command("go", "run", funcPath)
+
+			// Create a context with timeout
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			command := exec.CommandContext(ctx, "go", "run", funcPath)
 			output, err := command.CombinedOutput()
 			if err != nil {
 				fmt.Printf("Error running file: %v\n", err)
