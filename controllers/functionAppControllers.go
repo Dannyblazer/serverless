@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -122,7 +123,10 @@ func InvokeFunction(c *gin.Context) {
 		})
 		return
 	}
-	command := exec.Command("go", "run", functionApp.Path)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	command := exec.CommandContext(ctx, "go", "run", functionApp.Path)
 	output, err := command.CombinedOutput()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
