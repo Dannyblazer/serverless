@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"serverless/controllers"
 	"serverless/initializers"
+	"serverless/middleware"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -22,10 +25,15 @@ func main() {
 	router := gin.Default()
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
-	// Api Routes
-	router.POST("deploy/", controllers.DeployFunction)
-	router.GET("list/", controllers.ListFunction)
-	router.POST("invoke/:id", controllers.InvokeFunction)
+	// Api Routes (Account)
+	router.POST("account/create/", middleware.RequireAuth, controllers.AccountCreate)
+	router.POST("account/login/", middleware.RequireAuth, controllers.AccountLogin)
+	router.PUT("account/", middleware.RequireAuth, controllers.AccountUpdate)
+	router.DELETE("account/", middleware.RequireAuth, controllers.AccountDelete)
+
+	router.POST("deploy/", middleware.RequireAuth, controllers.DeployFunction)
+	router.GET("list/", middleware.RequireAuth, controllers.ListFunction)
+	router.POST("invoke/:id", middleware.RequireAuth, controllers.InvokeFunction)
 
 	// Create the main "platform" command
 	var rootCmd = &cobra.Command{Use: "platform"}
@@ -80,7 +88,11 @@ func main() {
 				fmt.Printf("Error: File %s does not exist\n", funcPath)
 				return
 			}
-			command := exec.Command("go", "run", funcPath)
+
+			// Create a context with timeout
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			command := exec.CommandContext(ctx, "go", "run", funcPath)
 			output, err := command.CombinedOutput()
 			if err != nil {
 				fmt.Printf("Error running file: %v\n", err)
