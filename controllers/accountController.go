@@ -33,6 +33,7 @@ type AccountResponse struct {
 }
 
 func AccountCreate(c *gin.Context) {
+	// Clean and Get response Body
 	var req AccountBody
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -41,18 +42,19 @@ func AccountCreate(c *gin.Context) {
 		return
 	}
 
-	// Hash Password and normalize email
+	// Hash Password and Normalize email
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Unable to Hash Password",
 		})
 		return
 	}
 
+	// Check and validate email uniqueness
 	var existingAccount models.Account
-	if err := initializers.DB.Where("email = ?", req.Email).First(&existingAccount).Error; err != nil {
+	if err := initializers.DB.Where("email = ?", req.Email).First(&existingAccount).Error; err == nil {
 		log.Printf("Account already exists for email: %s", req.Email)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Email Already Exists",
@@ -61,7 +63,7 @@ func AccountCreate(c *gin.Context) {
 	} else if err != gorm.ErrRecordNotFound {
 		log.Printf("Error checking existing account: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error Checking account",
+			"error": "Error checking account",
 		})
 		return
 	}
@@ -73,10 +75,12 @@ func AccountCreate(c *gin.Context) {
 
 	if err := initializers.DB.Create(&account).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error Creating account",
+			"error": "Error Creating Account",
 		})
 		return
 	}
+
+	// Create wallet for User
 
 	resp := AccountResponse{
 		ID:        account.ID,
