@@ -182,3 +182,17 @@ func AccountUpdate(c *gin.Context) {
 		"message": "Account Updated",
 	})
 }
+
+func AccountDelete(c *gin.Context) {
+	// Get Account ID jwt
+	accountID, ok := c.Get("accountID")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No account associated with jwt"})
+		return
+	}
+	if err := initializers.DB.Delete(&models.Account{}, accountID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to delete account"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Account Deleted"})
+}
