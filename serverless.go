@@ -26,8 +26,8 @@ func main() {
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	// Api Routes (Account)
-	router.POST("account/create/", middleware.RequireAuth, controllers.AccountCreate)
-	router.POST("account/login/", middleware.RequireAuth, controllers.AccountLogin)
+	router.POST("account/create/", controllers.AccountCreate)
+	router.POST("account/login/", controllers.AccountLogin)
 	router.PUT("account/", middleware.RequireAuth, controllers.AccountUpdate)
 	router.DELETE("account/", middleware.RequireAuth, controllers.AccountDelete)
 
