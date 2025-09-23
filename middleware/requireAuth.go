@@ -51,7 +51,7 @@ func RequireAuth(c *gin.Context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		// Attach to req
+		// Attach to req as Cookie
 		c.Set("accountID", existingAccount.ID)
 		// Continue
 		c.Next()
