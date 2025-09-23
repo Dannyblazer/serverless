@@ -76,7 +76,7 @@ func ListFunction(c *gin.Context) {
 		})
 		return
 	}
-
+	// Serializer returned function list to json
 	data := make([]FunctionAppList, len(functionApps))
 	for i, functionApp := range functionApps {
 		data[i] = FunctionAppList{
