@@ -28,7 +28,7 @@ type AccountResponse struct {
 	ID        uint      `json:"id"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
-	//Posts     []ResponsePost `json:"posts"`
+	//Functions     []ResponsePost `json:"function"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
@@ -72,7 +72,7 @@ func AccountCreate(c *gin.Context) {
 		Email:    req.Email,
 		Password: string(hash),
 	}
-
+	// Create account gorm query
 	if err := initializers.DB.Create(&account).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error Creating Account",
