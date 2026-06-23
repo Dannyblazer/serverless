@@ -44,7 +44,7 @@ func RequireAuth(c *gin.Context) {
 			return
 		}
 		// Find Account attached to token sub
-		var existingAccount models.Account
+		var existingAccount models.Accounts
 		initializers.DB.First(&existingAccount, claims["sub"])
 		if existingAccount.ID == 0 {
 			log.Println("Account Does not exist")
